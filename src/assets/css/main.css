@@ -27,3 +27,7 @@ h2{
     color: #ffffff99;
     font-size: .8em;
 }
+
+canvas {
+    border: solid #ffffff33 2px;
+}
