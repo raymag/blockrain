@@ -12,10 +12,21 @@ app.get('/', (req, res) => {
 const canvasWidth = 600
 const canvasHeight = 600
 const size = 60
+const coinRate = 1
 
 let players = []
 let coins = []
 
+function isHitting(player){
+    for(let i=0;i<coins.length;i++){
+        if(player.x >= coins[i].x 
+            && player.x <= coins[i].x + 60 
+            && player.y - 120 <= coins[i].y){
+                player.score++
+                coins.splice(i, 1)
+            }
+        }
+}
 function createPlayer(socket){
     let player = {
         id: socket.id,
@@ -31,9 +42,15 @@ function update(){
 }
 function downCoins(){
     for(let i=0;i<coins.length;i++){
-        coins[i].y += 10
+        coins[i].y += 3
+        if(coins[i].y >= canvasHeight){
+            coins.splice(i,1)
+        }
     }
     update()
+    if( Math.floor(Math.random()*100) <= coinRate ){
+        createCoin()
+    }
 }
 function createCoin(){
     let coin = {
@@ -41,8 +58,9 @@ function createCoin(){
         y: -100
     }
     coins.push(coin)
-    setInterval(downCoins, 3000)
 }
+
+setInterval(downCoins, 1000/30)
 
 io.on('connection', (socket) => {
     createPlayer(socket)
@@ -58,12 +76,12 @@ io.on('connection', (socket) => {
     socket.on('move', (data) => {
         for(let i=0;i<players.length;i++){
             if(players[i].id == socket.id){
-                createCoin()
+                isHitting(players[i])
                 if(data.move == 'left'){
-                    players[i].x -= 60
+                    players[i].x -= 5
                 }
                 else if(data.move == 'right'){
-                    players[i].x += 60
+                    players[i].x += 5
                 }
                 update()
                 break

@@ -4,13 +4,18 @@ let game = {
     canvas,
     players:undefined,
     coins:undefined,
+    images: {
+        coin: undefined
+    },
     createGame: (data) => {
         game.canvas = document.querySelector('#canvas')
         game.canvas.width = 600
         game.canvas.height = 600
         game.ctx = game.canvas.getContext('2d')
+        game.images.player = new Image()
+        game.images.coin = new Image()
         game.update(data)
-        window.addEventListener('keyup', (e) => {
+        window.addEventListener('keydown', (e) => {
             if(e.keyCode == 37){
                 socket.emit('move', {move:'left'})
             }
@@ -18,7 +23,7 @@ let game = {
                 socket.emit('move', {move:'right'})
             }
         })
-        setInterval(game.render.render, 1000/60)
+        setInterval(game.render.render, 1000/30)
     },
     update: (data) => {
         game.players = data.players
@@ -30,46 +35,33 @@ let game = {
             render.clearCanvas()
             render.renderPlayers()
             render.renderCoins()
-            requestAnimationFrame(render.render)
+            // requestAnimationFrame(render.render)
         },
         renderCoins: () => {
-            for(let i;i<game.coins.length;i++){
-                console.log('x')
+            for(let i=0;i<game.coins.length;i++){
                 let ctx = game.ctx
-                ctx.beginPath()
-                ctx.rect(game.coins[i].x, game.coins[i].y, 60, 60)
-                ctx.fillStyle = "#fff"
-                ctx.fill()
+                ctx.drawImage(game.images.coin, game.coins[i].x, game.coins[i].y, 60, 60)
+                game.images.coin.src = 'static/img/coin.png'
             }
         },
         renderPlayer: (player, isLocalPlayer) => {
             let ctx = game.ctx
-            // let img = new Image()
-            // img.onload = () => {
-            //     ctx.drawImage(img, 10, 10)
-            // }
-            // if(isLocalPlayer){
-            //     img.src = "static/img/player.png"
-            // }else{
-            //     img.src = "static/img/player_red.svg"
-            // }
-            // var img = new Image();
-            // img.onload = function () {
-            //     ctx.drawImage(img, player.x, player.y, 60, 60);
-            // }
-            // img.src = "static/img/player.svg";
             ctx.beginPath()
             ctx.rect(player.x, player.y, 60, 60)
-            ctx.fillStyle = "#000"
+            if(isLocalPlayer){
+                ctx.fillStyle = '#ff00ff66'
+            }else{
+                ctx.fillStyle = '#ffff0066'
+            }
             ctx.fill()
         },
         renderPlayers: () => {
             for(let i=0;i<game.players.length;i++){
-                let isLocalPlayer = false
                 if( game.players[i].id == socket.id ){
-                    isLocalPlayer = true
+                    game.render.renderPlayer(game.players[i], true)
+                }else{
+                    game.render.renderPlayer(game.players[i], false)
                 }
-                game.render.renderPlayer(game.players[i], isLocalPlayer)
             }
         },
         clearCanvas: () => {
