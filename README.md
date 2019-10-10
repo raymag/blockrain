@@ -1,10 +1,10 @@
-# SocketIO Template
-Simplest template for NodeJS and Socket.IO projects.
+# Blockrain
+A simple online game built with NodeJs and Socket.IO.
 
 ## Installing
 ```bash
-$ git clone https://github.com/raymag/socketio_template.git
-$ cd socketio_template
+$ git clone https://github.com/raymag/blockrain.git
+$ cd blockrain
 $ npm install
 ```
 
